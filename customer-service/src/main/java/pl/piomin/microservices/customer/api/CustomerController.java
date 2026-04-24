@@ -15,14 +15,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/customers")
 @Slf4j
-public class Api {
+public class CustomerController {
 
     @Autowired
     private AccountClient accountClient;
 
     private List<Customer> customers;
 
-    public Api() {
+    public CustomerController() {
         customers = new ArrayList<>();
         customers.add(new Customer(1, "12345", "Adam Kowalski", CustomerType.INDIVIDUAL));
         customers.add(new Customer(2, "12346", "Anna Malinowska", CustomerType.INDIVIDUAL));
