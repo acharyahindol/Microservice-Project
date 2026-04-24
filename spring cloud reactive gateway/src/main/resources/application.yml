@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true           # Auto-creates routes for all Eureka services
+          lower-case-service-id: true # Allows /account-service instead of /ACCOUNT-SERVICE
+      routes:
+        # Route for Account Service
+        - id: account_route
+          uri: lb://account-service  # 'lb://' uses Spring Cloud LoadBalancer with Eureka
+          predicates:
+           - Path=/account/**      # Matches any request starting with /account/
+          filters:
+           - StripPrefix=1          # Removes '/account' from the URL before forwarding
+         # Route for Customer Service
+        - id: customer_route
+          uri: lb://customer-service  # 'lb://' uses Spring Cloud LoadBalancer with Eureka
+          predicates:
+           - Path=/customer/**      # Matches any request starting with /account/
+          filters:
+           - StripPrefix=1    
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/		
+    instance:
+       # Forces Eureka to use IP instead of hostname (fixes many local 404s)
+      prefer-ip-address: true
+
+
