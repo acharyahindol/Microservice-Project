@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/accounts")
 @Slf4j
-public class Api {
+public class AcoountController {
 
     private List<Account> accounts;
 
-    public Api() {
+    public AcoountController() {
         accounts = new ArrayList<>();
         accounts.add(new Account(1, 1, "111111"));
         accounts.add(new Account(2, 2, "222222"));
