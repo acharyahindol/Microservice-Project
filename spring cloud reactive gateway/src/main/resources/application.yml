@@ -3,31 +3,47 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      redis-rate-limiter:
+        include-headers: true
       discovery:
         locator:
-          enabled: true           # Auto-creates routes for all Eureka services
+          enabled: true # Auto-creates routes for all Eureka services
           lower-case-service-id: true # Allows /account-service instead of /ACCOUNT-SERVICE
       routes:
         # Route for Account Service
         - id: account_route
-          uri: lb://account-service  # 'lb://' uses Spring Cloud LoadBalancer with Eureka
+          uri: lb://account-service # 'lb://' uses Spring Cloud LoadBalancer with Eureka
           predicates:
-           - Path=/account/**      # Matches any request starting with /account/
+            - Path=/account/** # Matches any request starting with /account/
           filters:
-           - StripPrefix=1          # Removes '/account' from the URL before forwarding
-         # Route for Customer Service
+            - StripPrefix=1 # Removes '/account' from the URL before forwarding
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@clientIpKeyResolver}"
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                redis-rate-limiter.requestedTokens: 1
+        # Route for Customer Service
         - id: customer_route
-          uri: lb://customer-service  # 'lb://' uses Spring Cloud LoadBalancer with Eureka
+          uri: lb://customer-service # 'lb://' uses Spring Cloud LoadBalancer with Eureka
           predicates:
-           - Path=/customer/**      # Matches any request starting with /account/
+            - Path=/customer/** # Matches any request starting with /customer/
           filters:
-           - StripPrefix=1    
+            - StripPrefix=1
+            - name: RequestRateLimiter
+              args:
+                key-resolver: "#{@clientIpKeyResolver}"
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                redis-rate-limiter.requestedTokens: 1
+  data:
+    redis:
+      host: localhost
+      port: 6379
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/		
-    instance:
-       # Forces Eureka to use IP instead of hostname (fixes many local 404s)
-      prefer-ip-address: true
-
-
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    # Forces Eureka to use IP instead of hostname (fixes many local 404s)
+    prefer-ip-address: true
