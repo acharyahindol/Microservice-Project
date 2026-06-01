@@ -1,9 +1,21 @@
 server:
-  port: ${PORT:3333}
+  port: ${PORT:3331}
 spring:
   application:
     name: customer-service
-    
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/customerdb}
+    username: ${SPRING_DATASOURCE_USERNAME:customer_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
 eureka:
   client:
     serviceUrl:
